@@ -17,6 +17,15 @@ object WritableBuffer {
   def takeView(b: WritableBuffer, rect: Rect): WritableBuffer =
     new BufferView(b, (rect.left, rect.top, rect.width(), rect.height()))
 
+  def copy(b: WritableBuffer): WritableBuffer = {
+    val bNew = new BasicBuffer(b.gridWidth, b.gridHeight)
+    for {
+      x <- 0 until b.gridWidth
+      y <- 0 until b.gridHeight
+    } bNew.setChar(x, y, b.charAt(x, y))
+    bNew
+  }
+
   trait UpdateListener {
     def onBufferUpdated(): Unit
   }

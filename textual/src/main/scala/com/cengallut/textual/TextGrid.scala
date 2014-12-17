@@ -3,7 +3,6 @@ package com.cengallut.textual
 import android.content.Context
 import android.graphics._
 import com.cengallut.textual.aside.Sugar._
-import com.cengallut.textual.basic.WritableBuffer.UpdateListener
 import com.cengallut.textual.basic.{Cursor, WritableBuffer}
 
 /** Displays an array of characters as a grid throughout its rectangle. */
@@ -11,24 +10,17 @@ abstract class TextGrid(context: Context)
     extends android.view.View(context)
     with WritableBuffer.UpdateListener {
 
-  def textSize: Float
+  def textSize: Float = 48f
 
-  def textColor: Int
+  def textColor: Int = Color.WHITE
 
-  def background: Int
+  def background: Int = Color.BLACK
+
+  def onBufferReady(buffer: WritableBuffer): Unit = ()
 
   private[textual] var buffer = WritableBuffer.zero
 
   def getBuffer: WritableBuffer = buffer
-
-  def setBuffer(b: WritableBuffer): Unit = {
-    if (buffer.gridHeight == b.gridHeight && buffer.gridWidth == b.gridWidth) {
-      buffer.setUpdateListener(UpdateListener())
-      buffer = b
-      buffer.setUpdateListener(this)
-    } else
-      throw new IllegalArgumentException("Must input a buffer with the same dimensions")
-  }
 
   lazy val cursor: Cursor = Cursor.base(buffer)
 
@@ -54,7 +46,6 @@ abstract class TextGrid(context: Context)
     (charWidth, charHeight)
   }
 
-
   override /* WritableBuffer.UpdateListener */
   def onBufferUpdated(): Unit = invalidate()
 
@@ -62,6 +53,7 @@ abstract class TextGrid(context: Context)
   protected def onSizeChanged(w: Int, h: Int, ow: Int, oh: Int): Unit = {
     buffer = WritableBuffer.ofDim(w / charDimension.x, h / charDimension.y)
     buffer.setUpdateListener(this)
+    onBufferReady(buffer)
   }
 
   override /* android.view.View */

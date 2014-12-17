@@ -48,6 +48,8 @@ trait TextCursor extends RawCursor[TextCursor] {
 
   def newLine(): TextCursor
 
+  def backspace()
+
 }
 
 object Cursor {
