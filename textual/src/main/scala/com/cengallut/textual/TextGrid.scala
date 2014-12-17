@@ -3,12 +3,13 @@ package com.cengallut.textual
 import android.content.Context
 import android.graphics._
 import com.cengallut.textual.aside.Sugar._
+import com.cengallut.textual.basic.WritableBuffer.UpdateListener
 import com.cengallut.textual.basic.{Cursor, WritableBuffer}
 
 /** Displays an array of characters as a grid throughout its rectangle. */
 abstract class TextGrid(context: Context)
     extends android.view.View(context)
-    with WritableBuffer {
+    with WritableBuffer.UpdateListener {
 
   def textSize: Float
 
@@ -16,14 +17,20 @@ abstract class TextGrid(context: Context)
 
   def background: Int
 
-  lazy val cursor: Cursor = Cursor.base(this)
+  private[textual] var buffer = WritableBuffer.zero
 
-  /** The array of characters that will fill the entire View rectangle. */
-  protected var buffer = Array.empty[Char]
+  def getBuffer: WritableBuffer = buffer
 
-  /** The dimension of the grid of characters that make up the window.
-    * dimension.x * dimension.y == buffer.length */
-  protected var dimension = (0,0)
+  def setBuffer(b: WritableBuffer): Unit = {
+    if (buffer.gridHeight == b.gridHeight && buffer.gridWidth == b.gridWidth) {
+      buffer.setUpdateListener(UpdateListener())
+      buffer = b
+      buffer.setUpdateListener(this)
+    } else
+      throw new IllegalArgumentException("Must input a buffer with the same dimensions")
+  }
+
+  lazy val cursor: Cursor = Cursor.base(buffer)
 
   /** Holds the information needed to draw characters onto the canvas. This object is used to
     * calculate the individual sizes of each character, and so determines how big of a buffer is
@@ -47,10 +54,14 @@ abstract class TextGrid(context: Context)
     (charWidth, charHeight)
   }
 
+
+  override /* WritableBuffer.UpdateListener */
+  def onBufferUpdated(): Unit = invalidate()
+
   override /* android.view.View */
   protected def onSizeChanged(w: Int, h: Int, ow: Int, oh: Int): Unit = {
-    dimension = (w / charDimension.x, h / charDimension.y)
-    buffer = Array.ofDim(dimension.x * dimension.y)
+    buffer = WritableBuffer.ofDim(w / charDimension.x, h / charDimension.y)
+    buffer.setUpdateListener(this)
   }
 
   override /* android.view.View */
@@ -58,17 +69,18 @@ abstract class TextGrid(context: Context)
     c.drawColor(background)
 
     val charBuffer = Array('c')
-    var (x, y) = dimension
+    var x = buffer.gridWidth
+    var y = buffer.gridHeight
     val xDelta = getWidth.toFloat / x
     val yDelta = getHeight.toFloat / y
 
     while (y > 0) {
       y -= 1
-      x = dimension.x
+      x = buffer.gridWidth
       while (x > 0) {
         x -= 1
 
-        charBuffer(0) = charAt(x, y)
+        charBuffer(0) = buffer.charAt(x, y)
         c.drawText(charBuffer, 0, 1, xDelta*x, yDelta*(y+1), paint)
       }
     }

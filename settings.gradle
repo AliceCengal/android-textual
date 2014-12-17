@@ -1,1 +1,1 @@
-include ':app', ':textual'
+include ':app', ':textual', ':javademo'

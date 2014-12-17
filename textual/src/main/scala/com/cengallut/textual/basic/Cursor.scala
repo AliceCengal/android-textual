@@ -1,6 +1,5 @@
 package com.cengallut.textual.basic
 
-import android.view.View
 import com.cengallut.textual.aside.Sugar._
 
 trait Cursor {
@@ -19,17 +18,49 @@ trait Cursor {
 
 }
 
+trait RawCursor[C <: RawCursor[C]] {
+
+  def set(c: Char): C
+
+  def move(dx: Int, dy: Int): C
+
+  def current: Char
+
+}
+
+trait TextCursor extends RawCursor[TextCursor] {
+
+  def write(c: Char): TextCursor
+
+  def write(s: String): TextCursor
+
+  def writeLn(c: Char): TextCursor =
+    write(c).newLine()
+
+  def writeLn(s: String): TextCursor =
+    write(s).newLine()
+
+  def linearMove(steps: Int): TextCursor
+
+  def advance() = linearMove(1)
+
+  def retreat() = linearMove(-1)
+
+  def newLine(): TextCursor
+
+}
+
 object Cursor {
 
-  def base(grid: View with WritableBuffer): Cursor = new BaseCursor(grid)
+  def base(grid: WritableBuffer): Cursor = new BaseCursor(grid)
 
-  private class BaseCursor(val grid: View with WritableBuffer) extends Cursor {
+  private class BaseCursor(val grid: WritableBuffer) extends Cursor {
 
     private var position = (0,0)
 
     override def write(c: Char): Cursor = {
       grid.setChar(position.x, position.y, c)
-      grid.invalidate()
+      grid.bufferChanged()
       advance()
       this
     }
@@ -39,13 +70,15 @@ object Cursor {
         grid.setChar(position.x, position.y, c)
         advance()
       }
-      grid.invalidate()
+      grid.bufferChanged()
       this
     }
 
     override def linearMove(steps: Int): Cursor = {
-      val xNew = (position.x + steps) % grid.gridWidth
-      val yNew = position.y + ((position.x + steps) / grid.gridWidth)
+      var xNew = (position.x + steps) % grid.gridWidth
+      var yNew = position.y + ((position.x + steps) / grid.gridWidth)
+
+
       position = (xNew, yNew)
       this
     }

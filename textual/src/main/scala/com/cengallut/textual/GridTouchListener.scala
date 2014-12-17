@@ -1,14 +1,14 @@
-package com.cengallut.textual.basic
+package com.cengallut.textual
 
 import android.view.{MotionEvent, View}
 
-trait GridTouchListener extends View.OnTouchListener {
+abstract class GridTouchListener extends View.OnTouchListener {
 
   override final def onTouch(v: View, event: MotionEvent): Boolean = {
     v match {
-      case grid: View with WritableBuffer =>
-        val x = event.getX / grid.getWidth * grid.gridWidth
-        val y = event.getY / grid.getHeight * grid.gridHeight
+      case grid: TextGrid =>
+        val x = event.getX / grid.getWidth * grid.buffer.gridWidth
+        val y = event.getY / grid.getHeight * grid.buffer.gridHeight
         onGridTouch(x.toInt, y.toInt)
       case _ =>
     }

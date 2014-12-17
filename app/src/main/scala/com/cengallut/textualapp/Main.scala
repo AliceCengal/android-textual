@@ -4,8 +4,7 @@ import android.app.Activity
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import com.cengallut.textual.TextGrid
-import com.cengallut.textual.basic.GridTouchListener
+import com.cengallut.textual.{GridTouchListener, TextGrid}
 
 class Main extends Activity {
 
