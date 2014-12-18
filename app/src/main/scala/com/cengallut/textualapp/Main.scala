@@ -1,9 +1,7 @@
 package com.cengallut.textualapp
 
 import android.app.Activity
-import android.graphics.Color
-import android.os.{Handler, Bundle}
-import android.util.Log
+import android.os.Bundle
 import com.cengallut.textual.TextGrid.BufferStateListener
 import com.cengallut.textual.basic.WritableBuffer
 import com.cengallut.textual.widget.Border

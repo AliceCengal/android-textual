@@ -2,14 +2,13 @@ package com.cengallut.textual
 
 import android.view.{MotionEvent, View}
 
-/**
- * An Adapter to translate a touch event in the View coordinate space
- * into the WritableBuffer coordinate space. An implementation of this
- * trait should be passed into the `setOnTouchListener` of a TextGrid.
- *
- * It seems that this trait is only usable from Scala, not from Java.
- * An alternate Listener-Adapter system is provided in the companion object.
- */
+/** An adapter to translate a touch event in the View coordinate space
+  * into the WritableBuffer coordinate space. An implementation of this
+  * trait should be passed into the `setOnTouchListener` of a TextGrid.
+  *
+  * It seems that this trait is only usable from Scala, not from Java.
+  * An alternate Listener-Adapter system is provided in the companion
+  * object. */
 trait GridTouchListener extends View.OnTouchListener {
 
   override final def onTouch(v: View, event: MotionEvent): Boolean = {
@@ -52,7 +51,7 @@ object GridTouchListener {
     }
   }
 
-  /** Creates a new GridTouchListener by a binary function. */
+  /** Creates a new GridTouchListener from a binary function. */
   def apply(f: (Int,Int)=>Unit) = new GridTouchListener {
     override def onGridTouch(x: Int, y: Int): Unit = f(x, y)
   }

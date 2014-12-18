@@ -1,7 +1,6 @@
 package com.cengallut.textual.basic
 
 import android.graphics.Rect
-import com.cengallut.textual.basic.WritableBuffer.UpdateListener
 
 object WritableBuffer {
 
@@ -67,7 +66,7 @@ trait WritableBuffer {
 
   def bufferChanged(): Unit
 
-  def setUpdateListener(listener: UpdateListener): Unit
+  def setUpdateListener(listener: WritableBuffer.UpdateListener): Unit
 
   def gridWidth: Int
 
@@ -83,6 +82,7 @@ trait WritableBuffer {
 }
 
 private class BasicBuffer(xDim: Int, yDim: Int) extends WritableBuffer {
+  import WritableBuffer._
 
   val buffer = Array.ofDim[Char](xDim * yDim)
 
@@ -108,6 +108,7 @@ private class BasicBuffer(xDim: Int, yDim: Int) extends WritableBuffer {
 }
 
 private class BufferView(basis: WritableBuffer, bound: (Int,Int,Int,Int)) extends WritableBuffer {
+  import WritableBuffer._
 
   override def bufferChanged(): Unit =
     basis.bufferChanged()
