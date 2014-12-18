@@ -7,7 +7,7 @@ import android.os.Bundle;
 import com.cengallut.textual.GridTouchListener;
 import com.cengallut.textual.TextGrid;
 
-public class Main extends Activity {
+public class Main extends Activity implements GridTouchListener.Interface {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,15 +30,13 @@ public class Main extends Activity {
             }
         };
 
-        grid.setOnTouchListener(new GridTouchListener() {
-            @Override
-            public void onGridTouch(int x, int y) {
-                grid.buffer().setChar(x, y, 'x');
-                grid.buffer().bufferChanged();
-            }
-        });
+        grid.setOnTouchListener(new GridTouchListener.Adapter(this));
 
         setContentView(grid);
     }
 
+    @Override
+    public void onGridTouch(int x, int y) {
+
+    }
 }

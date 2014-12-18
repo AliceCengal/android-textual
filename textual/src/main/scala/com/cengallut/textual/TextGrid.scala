@@ -1,7 +1,9 @@
 package com.cengallut.textual
 
+import android.app.Activity
 import android.content.Context
 import android.graphics._
+import com.cengallut.textual.TextGrid.BufferStateListener
 import com.cengallut.textual.aside.Sugar._
 import com.cengallut.textual.basic.{Cursor, WritableBuffer}
 
@@ -16,7 +18,13 @@ abstract class TextGrid(context: Context)
 
   def background: Int = Color.BLACK
 
-  def onBufferReady(buffer: WritableBuffer): Unit = ()
+  def bufferStateListener: BufferStateListener = new BufferStateListener {
+    override def onBufferReady(buffer: WritableBuffer): Unit = ()
+  }
+
+  def gridTouchListener: GridTouchListener = new GridTouchListener {
+    override def onGridTouch(x: Int, y: Int): Unit = ()
+  }
 
   private[textual] var buffer = WritableBuffer.zero
 
@@ -53,7 +61,7 @@ abstract class TextGrid(context: Context)
   protected def onSizeChanged(w: Int, h: Int, ow: Int, oh: Int): Unit = {
     buffer = WritableBuffer.ofDim(w / charDimension.x, h / charDimension.y)
     buffer.setUpdateListener(this)
-    onBufferReady(buffer)
+    bufferStateListener.onBufferReady(buffer)
   }
 
   override /* android.view.View */
@@ -80,6 +88,33 @@ abstract class TextGrid(context: Context)
 
 }
 
+object TextGrid {
 
+  trait BufferStateListener {
+    def onBufferReady(buffer: WritableBuffer): Unit
+  }
+
+  def create(act: Activity): TextGrid = {
+    act match {
+      case a: Activity with GridTouchListener with BufferStateListener =>
+        new TextGrid(act) {
+          override def bufferStateListener: BufferStateListener = a
+
+          override def gridTouchListener: GridTouchListener = a
+        }
+      case a: Activity with GridTouchListener =>
+        new TextGrid(act) {
+          override def gridTouchListener: GridTouchListener = a
+        }
+      case a: Activity with BufferStateListener =>
+        new TextGrid(act) {
+          override def bufferStateListener: BufferStateListener = a
+        }
+      case _ =>
+        new TextGrid(act) {}
+    }
+  }
+
+}
 
 
