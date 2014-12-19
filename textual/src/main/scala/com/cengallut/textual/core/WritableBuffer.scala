@@ -1,4 +1,4 @@
-package com.cengallut.textual.basic
+package com.cengallut.textual.core
 
 import android.graphics.Rect
 
@@ -8,15 +8,6 @@ object WritableBuffer {
 
   def ofDim(xDim: Int, yDim: Int): WritableBuffer =
     new BasicBuffer(xDim, yDim)
-
-  def takeView(b: WritableBuffer,
-               left: Int, top: Int, width: Int, height: Int): WritableBuffer =
-    new BufferView(b, (left, top, width, height))
-
-  def takeView(b: WritableBuffer, rect: Rect): WritableBuffer =
-    new BufferView(b, (rect.left, rect.top, rect.width(), rect.height()))
-
-
 
   trait UpdateListener {
     def onBufferUpdated(): Unit
@@ -32,17 +23,48 @@ object WritableBuffer {
     }
   }
 
-  implicit class BufferPrototype(b: WritableBuffer) {
+  /** Wrapper class for adding extension methods for cloning and sub-viewing
+    * a buffer. */
+  implicit class Prototype(val b: WritableBuffer) extends AnyVal {
 
+    /** Returns a view into the current buffer.
+      *
+      * offset_1 :: left
+      * offset_2 :: top
+      * offset_3 :: width
+      * offset_4 :: height
+      *
+      * if b is a 6x5 buffer:
+      *
+      *     ######
+      *     ######
+      *     ######
+      *     ######
+      *     ######
+      *
+      * Then calling b.takeView(1, 2, 3, 2) return a view to
+      * the region marked as 'O'
+      *
+      *     ######
+      *     ######
+      *     #OOO##
+      *     #OOO##
+      *     ######
+      *
+      * The returned Buffer shares the underlying representation
+      * with the original Buffer. */
     def takeView(offset: (Int,Int,Int,Int)): WritableBuffer =
       new BufferView(b, offset)
 
+    /** Same as before. */
     def takeView(left: Int, top: Int, width: Int, height: Int): WritableBuffer =
       new BufferView(b, (left, top, width, height))
 
+    /** Same as before. */
     def takeView(rect: Rect): WritableBuffer =
       new BufferView(b, (rect.left, rect.top, rect.width(), rect.height()))
 
+    /**  */
     def shrink(offset: (Int,Int,Int,Int)): WritableBuffer = {
       val width = b.gridWidth - offset._3 - offset._1
       val height = b.gridHeight - offset._4 - offset._2

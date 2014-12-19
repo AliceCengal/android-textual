@@ -5,9 +5,9 @@ import android.os.Bundle;
 
 import com.cengallut.textual.GridTouchListener;
 import com.cengallut.textual.TextGrid;
-import com.cengallut.textual.basic.WritableBuffer;
+import com.cengallut.textual.core.WritableBuffer;
 import com.cengallut.textual.widget.Border;
-import com.cengallut.textual.widget.Decoration;
+import com.cengallut.textual.decoration.Decoration;
 
 public class Main extends Activity
         implements GridTouchListener.Interface, TextGrid.BufferStateListener {

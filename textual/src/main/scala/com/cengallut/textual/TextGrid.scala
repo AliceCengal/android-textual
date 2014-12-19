@@ -5,7 +5,7 @@ import android.content.Context
 import android.graphics._
 import com.cengallut.textual.TextGrid.BufferStateListener
 import com.cengallut.textual.aside.Sugar._
-import com.cengallut.textual.basic.{Cursor, WritableBuffer}
+import com.cengallut.textual.core.{Cursor, WritableBuffer}
 
 /** Displays an array of characters as a grid throughout its rectangle. */
 abstract class TextGrid(context: Context)
@@ -59,6 +59,7 @@ abstract class TextGrid(context: Context)
 
   override /* android.view.View */
   protected def onSizeChanged(w: Int, h: Int, ow: Int, oh: Int): Unit = {
+    setOnTouchListener(gridTouchListener)
     buffer = WritableBuffer.ofDim(w / charDimension.x, h / charDimension.y)
     buffer.setUpdateListener(this)
     bufferStateListener.onBufferReady(buffer)

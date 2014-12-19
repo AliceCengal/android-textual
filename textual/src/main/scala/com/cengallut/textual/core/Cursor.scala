@@ -1,4 +1,4 @@
-package com.cengallut.textual.basic
+package com.cengallut.textual.core
 
 import com.cengallut.textual.aside.Sugar._
 

@@ -1,6 +1,6 @@
-package com.cengallut.textual.widget
+package com.cengallut.textual.decoration
 
-import com.cengallut.textual.basic.WritableBuffer
+import com.cengallut.textual.core.WritableBuffer
 
 object Border {
 
