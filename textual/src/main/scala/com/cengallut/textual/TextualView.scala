@@ -59,7 +59,6 @@ abstract class TextualView(context: Context)
 
   override /* android.view.View */
   protected def onSizeChanged(w: Int, h: Int, ow: Int, oh: Int): Unit = {
-    setOnTouchListener(gridTouchListener)
     buffer = CharGrid.ofDim(w / charDimension.x, h / charDimension.y)
     buffer.setUpdateListener(this)
     bufferStateListener.onBufferReady(buffer)

@@ -63,3 +63,44 @@ object GridAdapter {
 
 
 }
+
+/** Looking at the source code of android.view.View, it seems that each View will only
+  * hold one listener of a type. In order to have multiple listeners to different
+  * parts of the TextualView, we would have to composite them together. This class
+  * is fully immutable. All append methods return a new instance of this Composite.
+  * The original Composite is still a valid object. */
+class TouchComposite private (private val listeners: List[View.OnTouchListener])
+    extends View.OnTouchListener {
+
+  override def onTouch(v: View, event: MotionEvent) = {
+    listeners.foreach{ _.onTouch(v, event) }
+    true
+  }
+
+  def add(l: View.OnTouchListener) =
+    new TouchComposite(l :: listeners)
+
+  def + = add _
+
+  def ++(ls: Seq[View.OnTouchListener]) =
+    new TouchComposite(listeners ++ ls)
+
+  def addAll(ls: java.util.Collection[View.OnTouchListener]) = {
+    val it = ls.iterator()
+    var appended = listeners
+
+    // fucking hell
+    while (it.hasNext) {
+      appended ::= it.next()
+    }
+
+    new TouchComposite(appended)
+  }
+
+}
+
+object TouchComposite {
+
+  def empty: TouchComposite = new TouchComposite(List())
+
+}

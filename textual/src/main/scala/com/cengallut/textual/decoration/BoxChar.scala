@@ -95,6 +95,12 @@ object BoxChar {
 
   }
 
+  object Shade {
+    val light  = '\u2591'
+    val medium = '\u2592'
+    val heavy  = '\u5293'
+  }
+
   class Box(val corner: Corner, val line: Line)
   
   object Box {
@@ -111,12 +117,6 @@ object BoxChar {
     val dash4thick = new Box(Corner.Thick, Line.Dash4Thick)
 
     val rounded = new Box(Corner.Rounded, Line.Single)
-  }
-  
-  object Shade {
-    val light  = '\u2591'
-    val medium = '\u2592'
-    val heavy  = '\u5293'
   }
 
 }

@@ -35,5 +35,11 @@ object Border {
     }
   }
 
+  object LightShade extends Simple(BoxChar.Shade.light)
+
+  object MediumShade extends Simple(BoxChar.Shade.medium)
+
+  object HeavyShade extends Simple(BoxChar.Shade.heavy)
+
 }
 

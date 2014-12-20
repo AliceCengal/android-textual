@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.cengallut.textual.GridTouchListener;
 import com.cengallut.textual.TextualView;
+import com.cengallut.textual.TouchComposite;
 import com.cengallut.textual.core.CharGrid;
 import com.cengallut.textual.decoration.Border;
 import com.cengallut.textual.decoration.Decoration;
@@ -39,5 +40,6 @@ public class Main extends Activity
         buffer = b;
         border.decorate(buffer);
         buffer.notifyChanged();
+
     }
 }
