@@ -1,12 +1,32 @@
 package com.cengallut.textual.core
 
 /** The central abstraction of this library is a 2D array of chars. A CharGrid
-  * has a fixed dimension, given in the number of chars. The grid of chars can
-  * be indexed into. */
+  * has a fixed dimension, given by the number of chars on its sides. The grid of chars can
+  * be indexed into.
+  *
+  * There are two implementations of this interface. The first is a concrete implementation
+  * that actually contains an underlying representation of some number of chars somewhere
+  * in memory. This is the implementation returned by the factory methods defined in the
+  * companion object.
+  *
+  * The second implementation is a "view", or a window into another Grid. This is the
+  * implementation returned by the subviewing methods defined in the Prototype object.
+  * The view allows a subset of the parent Grid to be treated as if it is a true Grid.
+  * Border drawing and other decorations should work on a sub-grid just as it works on
+  * a true Grid.
+  *
+  * Since the sub-grid would have its own coordinate system and its own bounds, the
+  * FilterMap object is used to help delegate touch and click event from the original
+  * UI element to all child Grids.
+  */
 trait CharGrid {
 
+  /** Notifies listeners that the content of this buffer has changed. This method
+    * should be called after all batch of modifications to the Grid. Renderers of
+    * this Grid should set itself as a listener so that the Grid can be redrawn. */
   def notifyChanged(): Unit
 
+  /** Sets listener to receive an update when the Grid is modified. */
   def setUpdateListener(listener: CharGrid.UpdateListener): Unit
 
   def width: Int
@@ -26,8 +46,10 @@ trait CharGrid {
 
 object CharGrid {
 
+  /** Returns a Grid of dimension 0x0. */
   def zero: CharGrid = CharGrid.ofDim(0, 0)
 
+  /** Returns a Grid of the specified. */
   def ofDim(xDim: Int, yDim: Int): CharGrid =
     new BasicGrid(xDim, yDim)
 
@@ -163,7 +185,7 @@ object CharGrid {
 
   private class BasicGrid(xDim: Int, yDim: Int) extends CharGrid {
 
-    val buffer = Array.ofDim[Char](xDim * yDim)
+    val buffer = Array.fill[Char](xDim * yDim)(' ')
 
     private var updateListener = UpdateListener()
 

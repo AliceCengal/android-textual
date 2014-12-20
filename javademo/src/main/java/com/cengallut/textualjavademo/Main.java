@@ -14,7 +14,7 @@ public class Main extends Activity
         implements GridTouchListener.Interface,
         TextualView.BufferStateListener {
 
-    final Decoration border = new Border.Simple('H');
+    final Decoration border = new Border.Simple('#');
 
     CharGrid buffer = CharGrid.Factory.zero();
 
@@ -31,7 +31,11 @@ public class Main extends Activity
 
     @Override
     public void onGridTouch(int x, int y) {
-        buffer.setChar(x, y, 'O');
+        if (buffer.charAt(x, y) == 'O') {
+            buffer.setChar(x, y, 'X');
+        } else {
+            buffer.setChar(x, y, 'O');
+        }
         buffer.notifyChanged();
     }
 

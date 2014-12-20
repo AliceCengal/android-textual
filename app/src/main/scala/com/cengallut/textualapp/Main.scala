@@ -21,7 +21,10 @@ class Main extends Activity with GridTouchListener with BufferStateListener {
   }
 
   override def onGridTouch(x: Int, y: Int): Unit = {
-    buffer.setChar(x, y, 'O')
+    buffer.charAt(x, y) match {
+      case 'O' => buffer.setChar(x, y, 'X')
+      case _   => buffer.setChar(x, y, 'O')
+    }
     buffer.notifyChanged()
   }
 
