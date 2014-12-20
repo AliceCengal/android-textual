@@ -13,7 +13,7 @@ trait GridTouchListener extends View.OnTouchListener {
 
   override final def onTouch(v: View, event: MotionEvent): Boolean = {
     v match {
-      case grid: TextGrid =>
+      case grid: TextualView =>
         val x = event.getX / grid.getWidth * grid.buffer.gridWidth
         val y = event.getY / grid.getHeight * grid.buffer.gridHeight
         onGridTouch(x.toInt, y.toInt)
@@ -41,7 +41,7 @@ object GridTouchListener {
   class Adapter(listener: Interface) extends View.OnTouchListener {
     override final def onTouch(v: View, event: MotionEvent): Boolean = {
       v match {
-        case grid: TextGrid =>
+        case grid: TextualView =>
           val x = event.getX / grid.getWidth * grid.buffer.gridWidth
           val y = event.getY / grid.getHeight * grid.buffer.gridHeight
           listener.onGridTouch(x.toInt, y.toInt)

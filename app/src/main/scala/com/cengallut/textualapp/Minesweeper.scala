@@ -2,14 +2,14 @@ package com.cengallut.textualapp
 
 import android.util.Log
 import android.widget.Toast
-import com.cengallut.textual.TextGrid.BufferStateListener
+import com.cengallut.textual.TextualView.BufferStateListener
 import com.cengallut.textual.decoration.{Fill, Border}
 
 import scala.util.Random
 import android.app.Activity
 import android.os.Bundle
 import com.cengallut.textual.core.WritableBuffer
-import com.cengallut.textual.{TextGrid, GridTouchListener}
+import com.cengallut.textual.{TextualView, GridTouchListener}
 
 class Minesweeper extends Activity with GridTouchListener with BufferStateListener {
 
@@ -19,7 +19,7 @@ class Minesweeper extends Activity with GridTouchListener with BufferStateListen
   var mines     = Set.empty[(Int,Int)]
   var visited   = Set.empty[(Int,Int)]
 
-  lazy val grid = TextGrid.create(this)
+  lazy val grid = TextualView.create(this)
 
   override def onBufferReady(b: WritableBuffer): Unit = {
     buffer = b

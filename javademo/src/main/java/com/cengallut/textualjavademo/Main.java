@@ -4,23 +4,23 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.cengallut.textual.GridTouchListener;
-import com.cengallut.textual.TextGrid;
+import com.cengallut.textual.TextualView;
 import com.cengallut.textual.core.WritableBuffer;
-import com.cengallut.textual.widget.Border;
+import com.cengallut.textual.decoration.Border;
 import com.cengallut.textual.decoration.Decoration;
 
 public class Main extends Activity
-        implements GridTouchListener.Interface, TextGrid.BufferStateListener {
+        implements GridTouchListener.Interface, TextualView.BufferStateListener {
 
     final Decoration border = new Border.Simple('H');
 
-    WritableBuffer buffer = null;
+    WritableBuffer buffer = WritableBuffer.Factory.zero();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final TextGrid grid = new TextGrid(this) {};
+        final TextualView grid = new TextualView(this) {};
 
         grid.setOnTouchListener(new GridTouchListener.Adapter(this));
 

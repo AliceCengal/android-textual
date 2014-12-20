@@ -3,12 +3,12 @@ package com.cengallut.textual
 import android.app.Activity
 import android.content.Context
 import android.graphics._
-import com.cengallut.textual.TextGrid.BufferStateListener
+import com.cengallut.textual.TextualView.BufferStateListener
 import com.cengallut.textual.aside.Sugar._
 import com.cengallut.textual.core.{Cursor, WritableBuffer}
 
 /** Displays an array of characters as a grid throughout its rectangle. */
-abstract class TextGrid(context: Context)
+abstract class TextualView(context: Context)
     extends android.view.View(context)
     with WritableBuffer.UpdateListener {
 
@@ -89,30 +89,30 @@ abstract class TextGrid(context: Context)
 
 }
 
-object TextGrid {
+object TextualView {
 
   trait BufferStateListener {
     def onBufferReady(buffer: WritableBuffer): Unit
   }
 
-  def create(act: Activity): TextGrid = {
+  def create(act: Activity): TextualView = {
     act match {
       case a: Activity with GridTouchListener with BufferStateListener =>
-        new TextGrid(act) {
+        new TextualView(act) {
           override def bufferStateListener: BufferStateListener = a
 
           override def gridTouchListener: GridTouchListener = a
         }
       case a: Activity with GridTouchListener =>
-        new TextGrid(act) {
+        new TextualView(act) {
           override def gridTouchListener: GridTouchListener = a
         }
       case a: Activity with BufferStateListener =>
-        new TextGrid(act) {
+        new TextualView(act) {
           override def bufferStateListener: BufferStateListener = a
         }
       case _ =>
-        new TextGrid(act) {}
+        new TextualView(act) {}
     }
   }
 
