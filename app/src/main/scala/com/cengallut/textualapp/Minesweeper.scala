@@ -8,25 +8,25 @@ import com.cengallut.textual.decoration.{Fill, Border}
 import scala.util.Random
 import android.app.Activity
 import android.os.Bundle
-import com.cengallut.textual.core.WritableBuffer
+import com.cengallut.textual.core.CharGrid
 import com.cengallut.textual.{TextualView, GridTouchListener}
 
 class Minesweeper extends Activity with GridTouchListener with BufferStateListener {
 
-  var buffer    = WritableBuffer.zero
-  var minefield = WritableBuffer.zero
+  var buffer    = CharGrid.zero
+  var minefield = CharGrid.zero
 
   var mines     = Set.empty[(Int,Int)]
   var visited   = Set.empty[(Int,Int)]
 
   lazy val grid = TextualView.create(this)
 
-  override def onBufferReady(b: WritableBuffer): Unit = {
+  override def onBufferReady(b: CharGrid): Unit = {
     buffer = b
     minefield = b.shrink(1, 1, 1, 1)
     new Border.Simple('#').decorate(buffer)
     new Fill('.').decorate(minefield)
-    mines = generateMines(minefield.gridWidth, minefield.gridHeight, 40)
+    mines = generateMines(minefield.width, minefield.height, 40)
   }
 
   override def onGridTouch(x: Int, y: Int): Unit = {
@@ -35,7 +35,7 @@ class Minesweeper extends Activity with GridTouchListener with BufferStateListen
       this.finish()
     } else {
       visitAll(x, y)
-      minefield.bufferChanged()
+      minefield.notifyChanged()
     }
   }
 

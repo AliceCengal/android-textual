@@ -5,12 +5,12 @@ import android.content.Context
 import android.graphics._
 import com.cengallut.textual.TextualView.BufferStateListener
 import com.cengallut.textual.aside.Sugar._
-import com.cengallut.textual.core.{Cursor, WritableBuffer}
+import com.cengallut.textual.core.{Cursor, CharGrid}
 
-/** Displays an array of characters as a grid throughout its rectangle. */
+/** Displays an array of characters as a grid throughout its view window. */
 abstract class TextualView(context: Context)
     extends android.view.View(context)
-    with WritableBuffer.UpdateListener {
+    with CharGrid.UpdateListener {
 
   def textSize: Float = 48f
 
@@ -19,16 +19,16 @@ abstract class TextualView(context: Context)
   def background: Int = Color.BLACK
 
   def bufferStateListener: BufferStateListener = new BufferStateListener {
-    override def onBufferReady(buffer: WritableBuffer): Unit = ()
+    override def onBufferReady(buffer: CharGrid): Unit = ()
   }
 
   def gridTouchListener: GridTouchListener = new GridTouchListener {
     override def onGridTouch(x: Int, y: Int): Unit = ()
   }
 
-  private[textual] var buffer = WritableBuffer.zero
+  private[textual] var buffer = CharGrid.zero
 
-  def getBuffer: WritableBuffer = buffer
+  def getBuffer: CharGrid = buffer
 
   lazy val cursor: Cursor = Cursor.base(buffer)
 
@@ -55,12 +55,12 @@ abstract class TextualView(context: Context)
   }
 
   override /* WritableBuffer.UpdateListener */
-  def onBufferUpdated(): Unit = invalidate()
+  def onGridUpdated(): Unit = invalidate()
 
   override /* android.view.View */
   protected def onSizeChanged(w: Int, h: Int, ow: Int, oh: Int): Unit = {
     setOnTouchListener(gridTouchListener)
-    buffer = WritableBuffer.ofDim(w / charDimension.x, h / charDimension.y)
+    buffer = CharGrid.ofDim(w / charDimension.x, h / charDimension.y)
     buffer.setUpdateListener(this)
     bufferStateListener.onBufferReady(buffer)
   }
@@ -70,14 +70,14 @@ abstract class TextualView(context: Context)
     c.drawColor(background)
 
     val charBuffer = Array('c')
-    var x = buffer.gridWidth
-    var y = buffer.gridHeight
+    var x = buffer.width
+    var y = buffer.height
     val xDelta = getWidth.toFloat / x
     val yDelta = getHeight.toFloat / y
 
     while (y > 0) {
       y -= 1
-      x = buffer.gridWidth
+      x = buffer.width
       while (x > 0) {
         x -= 1
 
@@ -92,7 +92,7 @@ abstract class TextualView(context: Context)
 object TextualView {
 
   trait BufferStateListener {
-    def onBufferReady(buffer: WritableBuffer): Unit
+    def onBufferReady(buffer: CharGrid): Unit
   }
 
   def create(act: Activity): TextualView = {

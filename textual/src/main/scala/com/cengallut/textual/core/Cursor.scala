@@ -54,15 +54,15 @@ trait TextCursor extends RawCursor[TextCursor] {
 
 object Cursor {
 
-  def base(grid: WritableBuffer): Cursor = new BaseCursor(grid)
+  def base(grid: CharGrid): Cursor = new BaseCursor(grid)
 
-  private class BaseCursor(val grid: WritableBuffer) extends Cursor {
+  private class BaseCursor(val grid: CharGrid) extends Cursor {
 
     private var position = (0,0)
 
     override def write(c: Char): Cursor = {
       grid.setChar(position.x, position.y, c)
-      grid.bufferChanged()
+      grid.notifyChanged()
       advance()
       this
     }
@@ -72,13 +72,13 @@ object Cursor {
         grid.setChar(position.x, position.y, c)
         advance()
       }
-      grid.bufferChanged()
+      grid.notifyChanged()
       this
     }
 
     override def linearMove(steps: Int): Cursor = {
-      var xNew = (position.x + steps) % grid.gridWidth
-      var yNew = position.y + ((position.x + steps) / grid.gridWidth)
+      var xNew = (position.x + steps) % grid.width
+      var yNew = position.y + ((position.x + steps) / grid.width)
 
 
       position = (xNew, yNew)

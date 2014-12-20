@@ -3,7 +3,7 @@ package com.cengallut.textualapp
 import android.app.Activity
 import android.os.Bundle
 import com.cengallut.textual.TextualView.BufferStateListener
-import com.cengallut.textual.core.WritableBuffer
+import com.cengallut.textual.core.CharGrid
 import com.cengallut.textual.decoration.Border
 import com.cengallut.textual.{GridTouchListener, TextualView}
 
@@ -11,7 +11,7 @@ class Main extends Activity with GridTouchListener with BufferStateListener {
 
   val border = new Border.Simple('#')
 
-  var buffer = WritableBuffer.zero
+  var buffer = CharGrid.zero
 
   lazy val textGrid = TextualView.create(this)
 
@@ -22,13 +22,13 @@ class Main extends Activity with GridTouchListener with BufferStateListener {
 
   override def onGridTouch(x: Int, y: Int): Unit = {
     buffer.setChar(x, y, 'O')
-    buffer.bufferChanged()
+    buffer.notifyChanged()
   }
 
-  override def onBufferReady(b: WritableBuffer): Unit = {
+  override def onBufferReady(b: CharGrid): Unit = {
     buffer = b
     border.decorate(buffer)
-    buffer.bufferChanged()
+    buffer.notifyChanged()
   }
 
 }
