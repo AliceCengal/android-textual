@@ -47,7 +47,7 @@ trait CharGrid {
 object CharGrid {
 
   /** Returns a Grid of dimension 0x0. */
-  def zero: CharGrid = CharGrid.ofDim(0, 0)
+  val zero: CharGrid = CharGrid.ofDim(0, 0)
 
   /** Returns a Grid of the specified. */
   def ofDim(xDim: Int, yDim: Int): CharGrid =
@@ -132,40 +132,40 @@ object CharGrid {
     }
 
     /** Returns two Buffers. */
-    def verticalBisect(b: CharGrid): (CharGrid,CharGrid) = {
+    def verticalBisect: (CharGrid,CharGrid) = {
       val (rightOffset, leftOffset) = partitionLength(b.width, 0.5)
-      val left = b.shrink(0, 0, leftOffset, 0)
-      val right = b.shrink(rightOffset, 0, 0, 0)
+      val left = shrink(0, 0, leftOffset, 0)
+      val right = shrink(rightOffset, 0, 0, 0)
       (left, right)
     }
 
     /** Returns two Buffers. */
-    def horizontalBisect(b: CharGrid): (CharGrid,CharGrid) = {
+    def horizontalBisect: (CharGrid,CharGrid) = {
       val (bottomOffset, topOffset) = partitionLength(b.height, 0.5)
-      val top = b.shrink(0, topOffset, 0, 0)
-      val bottom = b.shrink(0, 0, 0, bottomOffset)
+      val top = shrink(0, topOffset, 0, 0)
+      val bottom = shrink(0, 0, 0, bottomOffset)
       (top, bottom)
     }
 
     /** Returns two Buffers. */
-    def verticalSplit(b: CharGrid, ratio: Double): (CharGrid,CharGrid) = {
+    def verticalSplit(ratio: Double): (CharGrid,CharGrid) = {
       val (bottomOffset, topOffset) = partitionLength(b.height, ratio)
-      val top = b.shrink(0, topOffset, 0, 0)
-      val bottom = b.shrink(0, 0, 0, bottomOffset)
+      val top = shrink(0, topOffset, 0, 0)
+      val bottom = shrink(0, 0, 0, bottomOffset)
       (top, bottom)
     }
 
     /** Returns two Buffers. */
-    def horizontalSplit(b: CharGrid, ratio: Double): (CharGrid,CharGrid) = {
+    def horizontalSplit(ratio: Double): (CharGrid,CharGrid) = {
       val (bottomOffset, topOffset) = partitionLength(b.height, ratio)
-      val top = b.shrink(0, topOffset, 0, 0)
-      val bottom = b.shrink(0, 0, 0, bottomOffset)
+      val top = shrink(0, topOffset, 0, 0)
+      val bottom = shrink(0, 0, 0, bottomOffset)
       (top, bottom)
     }
 
     /** Returns a pair (n1,n2) such that n1 + n2 == l  and n1/l == ratio */
     private def partitionLength(l: Int, ratio: Double): (Int,Int) = {
-      val first = l * ratio.ceil.toInt
+      val first = (l * ratio).ceil.toInt
       ( first , l - first )
     }
 
@@ -185,16 +185,18 @@ object CharGrid {
 
   private class BasicGrid(xDim: Int, yDim: Int) extends CharGrid {
 
-    val buffer = Array.fill[Char](xDim * yDim)(' ')
+    /** The most important thing in the whole library, yet so innocuous. */
+    private val buffer = Array.fill[Char](xDim * yDim)(' ')
 
     private var updateListener = UpdateListener()
 
     override def notifyChanged(): Unit = updateListener.onGridUpdated()
 
-    def charAt(x: Int, y: Int) = {
-      assert(isInRange(x, y), "index out of bound")
-      buffer(x + (y * width))
-    }
+    override def charAt(x: Int, y: Int) =
+      if (isInRange(x, y))
+        buffer(x + (y * width))
+      else
+        throw new IndexOutOfBoundsException("Point is not on the Grid.")
 
     override def setUpdateListener(listener: UpdateListener): Unit =
       updateListener = listener
@@ -209,14 +211,16 @@ object CharGrid {
     override def filterMap: FilterMap = FilterMap.identity
   }
 
-  private class GridView(basis: CharGrid, bound: (Int,Int,Int,Int)) extends CharGrid {
+  private class GridView(
+      private val basis: CharGrid,
+      private val bound: (Int,Int,Int,Int)) extends CharGrid {
 
     override def notifyChanged(): Unit =
       basis.notifyChanged()
 
-    override def width: Int = bound._3
+    override val width: Int = bound._3
 
-    override def height: Int = bound._4
+    override val height: Int = bound._4
 
     override def setChar(x: Int, y: Int, c: Char): Unit =
       basis.setChar(x + bound._1, y + bound._2, c)

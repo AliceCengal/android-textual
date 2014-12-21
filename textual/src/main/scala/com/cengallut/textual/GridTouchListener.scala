@@ -1,6 +1,8 @@
 package com.cengallut.textual
 
+import android.view.View.OnTouchListener
 import android.view.{MotionEvent, View}
+import com.cengallut.textual.core.{CharGrid, GridAgent}
 
 /** An adapter to translate a touch event in the View coordinate space
   * into the WritableBuffer coordinate space. An implementation of this
@@ -9,36 +11,13 @@ import android.view.{MotionEvent, View}
   * It seems that this trait is only usable from Scala, not from Java.
   * An alternate Listener-Adapter system is provided in the companion
   * object. */
-trait GridTouchListener extends View.OnTouchListener {
 
-  override final def onTouch(v: View, event: MotionEvent): Boolean = {
-    v match {
-      case grid: TextualView =>
-        val x = event.getX / grid.getWidth * grid.buffer.width
-        val y = event.getY / grid.getHeight * grid.buffer.height
-        onGridTouch(x.toInt, y.toInt)
-      case _ =>
-    }
-    true
-  }
-
-  def onGridTouch(x: Int, y: Int): Unit
-
-}
-
+/*
 object GridTouchListener {
-
-  /** A pure interface for a TextGrid's touch event handler. An
-    * implementation of this interface should be wrapped in
-    * `GridTouchListener.Adapter` before being passed into
-    * the `setOnTouchListener` of a TextGrid. */
-  trait Interface {
-    def onGridTouch(x: Int, y: Int): Unit
-  }
 
   /** An adapter to transform touch events from the coordinate
     * space of the View to the WritableBuffer's coordinate space. */
-  class Adapter(listener: Interface) extends View.OnTouchListener {
+  class Adapter(listener: GridAgent) extends View.OnTouchListener {
     override final def onTouch(v: View, event: MotionEvent): Boolean = {
       v match {
         case grid: TextualView =>
@@ -58,9 +37,35 @@ object GridTouchListener {
 
 }
 
-object GridAdapter {
+*/
 
+object Action {
 
+  def apply(grid: CharGrid) = new ActionFactory(grid)
+
+  class ActionFactory(private val grid: CharGrid) {
+
+    def touch(agent: GridAgent) = new OnTouchListener {
+      override def onTouch(v: View, event: MotionEvent) = v match {
+        case textual: TextualView =>
+
+          val (xx, yy) = textual.filterMap
+            .map(event.getX.toInt, event.getY.toInt)
+
+          if (event.getAction == MotionEvent.ACTION_UP &&
+              grid.filterMap.filter(xx, yy)) {
+            val (xxx, yyy) = grid.filterMap.map(xx, yy)
+            agent.onAction(xxx, yyy)
+            true
+          } else {
+            false
+          }
+        case _ => throw new IllegalStateException("")
+      }
+
+    }
+
+  }
 
 }
 
@@ -100,7 +105,5 @@ class TouchComposite private (private val listeners: List[View.OnTouchListener])
 }
 
 object TouchComposite {
-
   def empty: TouchComposite = new TouchComposite(List())
-
 }

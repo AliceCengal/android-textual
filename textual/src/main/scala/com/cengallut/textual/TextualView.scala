@@ -1,16 +1,14 @@
 package com.cengallut.textual
 
-import android.app.Activity
 import android.content.Context
 import android.graphics._
 import com.cengallut.textual.TextualView.BufferStateListener
 import com.cengallut.textual.aside.Sugar._
-import com.cengallut.textual.core.{Cursor, CharGrid}
+import com.cengallut.textual.core.{FilterMap, Cursor, CharGrid}
 
 /** Displays an array of characters as a grid throughout its view window. */
-abstract class TextualView(context: Context)
-    extends android.view.View(context)
-    with CharGrid.UpdateListener {
+class TextualView private (context: Context, btl: BufferStateListener)
+    extends android.view.View(context) {
 
   def textSize: Float = 48f
 
@@ -18,15 +16,11 @@ abstract class TextualView(context: Context)
 
   def background: Int = Color.BLACK
 
-  def bufferStateListener: BufferStateListener = new BufferStateListener {
-    override def onBufferReady(buffer: CharGrid): Unit = ()
-  }
-
-  def gridTouchListener: GridTouchListener = new GridTouchListener {
-    override def onGridTouch(x: Int, y: Int): Unit = ()
-  }
+  private val bufferStateListener = btl
 
   private[textual] var buffer = CharGrid.zero
+
+  private[textual] var filterMap = FilterMap.identity
 
   def getBuffer: CharGrid = buffer
 
@@ -54,13 +48,21 @@ abstract class TextualView(context: Context)
     (charWidth, charHeight)
   }
 
-  override /* WritableBuffer.UpdateListener */
-  def onGridUpdated(): Unit = invalidate()
+  private lazy val gridUpdateListener = new CharGrid.UpdateListener {
+    override def onGridUpdated(): Unit = invalidate()
+  }
 
   override /* android.view.View */
   protected def onSizeChanged(w: Int, h: Int, ow: Int, oh: Int): Unit = {
     buffer = CharGrid.ofDim(w / charDimension.x, h / charDimension.y)
-    buffer.setUpdateListener(this)
+    filterMap = new FilterMap {
+      override def filter(x: Int, y: Int): Boolean = true
+      override def map(x: Int, y: Int): (Int, Int) =
+        (x / w * buffer.width,
+          y / h * buffer.height)
+    }
+
+    buffer.setUpdateListener(gridUpdateListener)
     bufferStateListener.onBufferReady(buffer)
   }
 
@@ -94,26 +96,11 @@ object TextualView {
     def onBufferReady(buffer: CharGrid): Unit
   }
 
-  def create(act: Activity): TextualView = {
-    act match {
-      case a: Activity with GridTouchListener with BufferStateListener =>
-        new TextualView(act) {
-          override def bufferStateListener: BufferStateListener = a
+  def create(ctx: Context with BufferStateListener): TextualView =
+    new TextualView(ctx, ctx)
 
-          override def gridTouchListener: GridTouchListener = a
-        }
-      case a: Activity with GridTouchListener =>
-        new TextualView(act) {
-          override def gridTouchListener: GridTouchListener = a
-        }
-      case a: Activity with BufferStateListener =>
-        new TextualView(act) {
-          override def bufferStateListener: BufferStateListener = a
-        }
-      case _ =>
-        new TextualView(act) {}
-    }
-  }
+  def create(ctx: Context, listener: BufferStateListener): TextualView =
+    new TextualView(ctx, listener)
 
 }
 

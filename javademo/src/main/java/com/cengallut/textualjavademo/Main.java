@@ -3,7 +3,6 @@ package com.cengallut.textualjavademo;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.cengallut.textual.GridTouchListener;
 import com.cengallut.textual.TextualView;
 import com.cengallut.textual.TouchComposite;
 import com.cengallut.textual.core.CharGrid;
@@ -11,8 +10,7 @@ import com.cengallut.textual.decoration.Border;
 import com.cengallut.textual.decoration.Decoration;
 
 public class Main extends Activity
-        implements GridTouchListener.Interface,
-        TextualView.BufferStateListener {
+        implements TextualView.BufferStateListener {
 
     final Decoration border = new Border.Simple('#');
 
@@ -22,14 +20,13 @@ public class Main extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final TextualView grid = new TextualView(this) {};
+        final TextualView grid = TextualView.create(this);
 
-        grid.setOnTouchListener(new GridTouchListener.Adapter(this));
+        //grid.setOnTouchListener(new GridTouchListener.Adapter(this));
 
         setContentView(grid);
     }
 
-    @Override
     public void onGridTouch(int x, int y) {
         if (buffer.charAt(x, y) == 'O') {
             buffer.setChar(x, y, 'X');
