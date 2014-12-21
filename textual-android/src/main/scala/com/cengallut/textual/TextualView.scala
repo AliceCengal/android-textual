@@ -22,8 +22,6 @@ class TextualView private (context: Context, btl: BufferStateListener)
 
   private[textual] var filterMap = FilterMap.identity
 
-  def getBuffer: CharGrid = buffer
-
   lazy val cursor: Cursor = Cursor.base(buffer)
 
   /** Holds the information needed to draw characters onto the canvas. This object is used to

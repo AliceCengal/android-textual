@@ -13,7 +13,6 @@ import com.cengallut.textual.decoration.Decoration;
 import com.cengallut.textual.decoration.Fill;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class Main extends Activity
@@ -23,7 +22,7 @@ public class Main extends Activity
             new Fill('O'),
             new Border.Simple('#'));
 
-    CharGrid buffer = CharGrid.Factory.zero();
+    CharGrid buffer = null;
 
     TextualView textual = null;
 

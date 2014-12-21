@@ -67,14 +67,6 @@ object CharGrid {
     }
   }
 
-  /** A static factory that redefines the factory method in the CharGrid companion
-    * object. This is necessary because the static forwarder method is not generated for
-    * some reason, so the factory methods are not visible from Java. */
-  object Factory {
-    def zero: CharGrid = CharGrid.zero
-    def ofDim(xDim: Int, yDim: Int) = CharGrid.ofDim(xDim, yDim)
-  }
-
   /** Wrapper class for adding extension methods for cloning and sub-viewing
     * a CharGrid. */
   implicit class Prototype(val b: CharGrid) extends AnyVal {
