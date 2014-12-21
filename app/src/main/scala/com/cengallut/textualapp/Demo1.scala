@@ -6,7 +6,8 @@ import com.cengallut.textual.core.CharGrid
 import com.cengallut.textual.decoration.{Fill, Border}
 import com.cengallut.textual.{Action, TextualView}
 
-class Main extends Activity with TextualView.BufferStateListener {
+/** Demonstration of decoration and touch event handling for a single Grid. */
+class Demo1 extends Activity with TextualView.BufferStateListener {
 
   val decos = Seq(
     new Fill('O'),
@@ -25,14 +26,15 @@ class Main extends Activity with TextualView.BufferStateListener {
     buffer = b
     decos.foreach { _.decorate(b) }
 
-    textGrid.setOnTouchListener(Action(b).touch { (x, y) =>
+    val touchListener = Action(b).touch { (x, y) =>
       buffer.charAt(x, y) match {
         case 'O' => buffer.setChar(x, y, 'X')
         case _   => buffer.setChar(x, y, 'O')
       }
       buffer.notifyChanged()
-    })
+    }
 
+    textGrid.setOnTouchListener(touchListener)
     buffer.notifyChanged()
   }
 

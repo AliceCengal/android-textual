@@ -5,81 +5,44 @@ import android.view.View.OnTouchListener
 import android.view.{MotionEvent, View}
 import com.cengallut.textual.core.{CharGrid, GridAgent}
 
-/** An adapter to translate a touch event in the View coordinate space
-  * into the WritableBuffer coordinate space. An implementation of this
-  * trait should be passed into the `setOnTouchListener` of a TextGrid.
-  *
-  * It seems that this trait is only usable from Scala, not from Java.
-  * An alternate Listener-Adapter system is provided in the companion
-  * object. */
+class Action(private val grid: CharGrid) {
 
-/*
-object GridTouchListener {
+  def touch(agent: GridAgent): OnTouchListener = new OnTouchListener {
+    override def onTouch(v: View, event: MotionEvent) = v match {
+      case textual: TextualView =>
 
-  /** An adapter to transform touch events from the coordinate
-    * space of the View to the WritableBuffer's coordinate space. */
-  class Adapter(listener: GridAgent) extends View.OnTouchListener {
-    override final def onTouch(v: View, event: MotionEvent): Boolean = {
-      v match {
-        case grid: TextualView =>
-          val x = event.getX / grid.getWidth * grid.buffer.width
-          val y = event.getY / grid.getHeight * grid.buffer.height
-          listener.onGridTouch(x.toInt, y.toInt)
-        case _ =>
-      }
-      true
+        //Log.d("TouchListener", s"Received event on TextualView: ${event.getActionMasked}")
+        if (event.getAction == MotionEvent.ACTION_DOWN) {
+          true
+        } else if (event.getAction == MotionEvent.ACTION_UP) {
+          //Log.d("TouchListener", s"Received Received up event at (${event.getX}, ${event.getY}})")
+          val (xx, yy) = textual.filterMap
+            .map(event.getX.toInt, event.getY.toInt)
+          //Log.d("TouchListener", s"Touch coordinate on grid is ($xx, $yy)")
+          if (grid.filterMap.filter(xx, yy)) {
+
+            val (xxx, yyy) = grid.filterMap.map(xx, yy)
+            //Log.d("TouchListener", s"Received touch on TextGrid at ($xxx, $yyy)")
+
+            agent.onAction(xxx, yyy)
+            true
+          } else {
+            false
+          }
+
+        } else false
+
+      case _ => throw new IllegalStateException("")
     }
+
   }
 
-  /** Creates a new GridTouchListener from a binary function. */
-  def apply(f: (Int,Int)=>Unit) = new GridTouchListener {
-    override def onGridTouch(x: Int, y: Int): Unit = f(x, y)
-  }
+  def touch(reactor: (Int, Int) => Unit): OnTouchListener = touch(GridAgent(reactor))
 
 }
 
-*/
-
 object Action {
-
-  def apply(grid: CharGrid) = new Factory(grid)
-
-  class Factory(private val grid: CharGrid) {
-
-    def touch(agent: GridAgent): OnTouchListener = new OnTouchListener {
-      override def onTouch(v: View, event: MotionEvent) = v match {
-        case textual: TextualView =>
-
-          //Log.d("TouchListener", s"Received event on TextualView: ${event.getActionMasked}")
-          if (event.getAction == MotionEvent.ACTION_DOWN) {
-            true
-          } else if (event.getAction == MotionEvent.ACTION_UP) {
-            //Log.d("TouchListener", s"Received Received up event at (${event.getX}, ${event.getY}})")
-            val (xx, yy) = textual.filterMap
-              .map(event.getX.toInt, event.getY.toInt)
-            //Log.d("TouchListener", s"Touch coordinate on grid is ($xx, $yy)")
-            if (grid.filterMap.filter(xx, yy)) {
-
-              val (xxx, yyy) = grid.filterMap.map(xx, yy)
-              //Log.d("TouchListener", s"Received touch on TextGrid at ($xxx, $yyy)")
-
-              agent.onAction(xxx, yyy)
-              true
-            } else {
-              false
-            }
-
-          } else false
-
-        case _ => throw new IllegalStateException("")
-      }
-
-    }
-
-    def touch(reactor: (Int,Int)=>Unit): OnTouchListener = touch(GridAgent(reactor))
-
-  }
-
+  def apply(g: CharGrid) = new Action(g)
 }
 
 /** Looking at the source code of android.view.View, it seems that each View will only
