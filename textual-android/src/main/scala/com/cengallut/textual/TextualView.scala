@@ -58,8 +58,8 @@ class TextualView private (context: Context, btl: BufferStateListener)
     filterMap = new FilterMap {
       override def filter(x: Int, y: Int): Boolean = true
       override def map(x: Int, y: Int): (Int, Int) =
-        (x / w * buffer.width,
-          y / h * buffer.height)
+        (x * buffer.width / w,
+          y * buffer.height / h)
     }
 
     buffer.setUpdateListener(gridUpdateListener)

@@ -9,9 +9,9 @@ import scala.util.Random
 import android.app.Activity
 import android.os.Bundle
 import com.cengallut.textual.core.CharGrid
-import com.cengallut.textual.{TextualView, GridTouchListener}
+import com.cengallut.textual.TextualView
 
-class Minesweeper extends Activity with GridTouchListener with BufferStateListener {
+class Minesweeper extends Activity with BufferStateListener {
 
   var buffer    = CharGrid.zero
   var minefield = CharGrid.zero
@@ -29,7 +29,7 @@ class Minesweeper extends Activity with GridTouchListener with BufferStateListen
     mines = generateMines(minefield.width, minefield.height, 40)
   }
 
-  override def onGridTouch(x: Int, y: Int): Unit = {
+  def onGridTouch(x: Int, y: Int): Unit = {
     if (mines(x, y)) {
       Toast.makeText(this, "You're dead", Toast.LENGTH_SHORT).show()
       this.finish()

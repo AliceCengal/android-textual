@@ -1,5 +1,6 @@
 package com.cengallut.textual
 
+import android.util.Log
 import android.view.View.OnTouchListener
 import android.view.{MotionEvent, View}
 import com.cengallut.textual.core.{CharGrid, GridAgent}
@@ -41,29 +42,41 @@ object GridTouchListener {
 
 object Action {
 
-  def apply(grid: CharGrid) = new ActionFactory(grid)
+  def apply(grid: CharGrid) = new Factory(grid)
 
-  class ActionFactory(private val grid: CharGrid) {
+  class Factory(private val grid: CharGrid) {
 
-    def touch(agent: GridAgent) = new OnTouchListener {
+    def touch(agent: GridAgent): OnTouchListener = new OnTouchListener {
       override def onTouch(v: View, event: MotionEvent) = v match {
         case textual: TextualView =>
 
-          val (xx, yy) = textual.filterMap
-            .map(event.getX.toInt, event.getY.toInt)
-
-          if (event.getAction == MotionEvent.ACTION_UP &&
-              grid.filterMap.filter(xx, yy)) {
-            val (xxx, yyy) = grid.filterMap.map(xx, yy)
-            agent.onAction(xxx, yyy)
+          //Log.d("TouchListener", s"Received event on TextualView: ${event.getActionMasked}")
+          if (event.getAction == MotionEvent.ACTION_DOWN) {
             true
-          } else {
-            false
-          }
+          } else if (event.getAction == MotionEvent.ACTION_UP) {
+            //Log.d("TouchListener", s"Received Received up event at (${event.getX}, ${event.getY}})")
+            val (xx, yy) = textual.filterMap
+              .map(event.getX.toInt, event.getY.toInt)
+            //Log.d("TouchListener", s"Touch coordinate on grid is ($xx, $yy)")
+            if (grid.filterMap.filter(xx, yy)) {
+
+              val (xxx, yyy) = grid.filterMap.map(xx, yy)
+              //Log.d("TouchListener", s"Received touch on TextGrid at ($xxx, $yyy)")
+
+              agent.onAction(xxx, yyy)
+              true
+            } else {
+              false
+            }
+
+          } else false
+
         case _ => throw new IllegalStateException("")
       }
 
     }
+
+    def touch(reactor: (Int,Int)=>Unit): OnTouchListener = touch(GridAgent(reactor))
 
   }
 
