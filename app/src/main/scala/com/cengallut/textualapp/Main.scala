@@ -13,7 +13,7 @@ class Main extends Activity with AdapterView.OnItemClickListener {
 
     val adapter = new ArrayAdapter[String](
       this, android.R.layout.simple_list_item_1,
-      Array("Demo 1", "Demo 2", "Demo 3"))
+      Array("Demo 1", "Demo 2", "Demo 3", "Minesweeper"))
 
     val list = new ListView(this)
     list.setAdapter(adapter)
@@ -31,6 +31,7 @@ class Main extends Activity with AdapterView.OnItemClickListener {
       case 0 => startActivity(new Intent(this, classOf[Demo1]))
       case 1 => startActivity(new Intent(this, classOf[Demo2]))
       case 2 => startActivity(new Intent(this, classOf[Demo3]))
+      case 3 => startActivity(new Intent(this, classOf[Minesweeper]))
     }
 
   }

@@ -1,17 +1,19 @@
 package com.cengallut.textualapp
 
-import android.util.Log
-import android.widget.Toast
-import com.cengallut.textual.TextualView.BufferStateListener
-import com.cengallut.textual.decoration.{Fill, Border}
-
 import scala.util.Random
+
 import android.app.Activity
 import android.os.Bundle
-import com.cengallut.textual.core.CharGrid
-import com.cengallut.textual.TextualView
+import android.util.Log
+import android.widget.Toast
 
-class Minesweeper extends Activity with BufferStateListener {
+import com.cengallut.textual.TextualView.BufferStateListener
+import com.cengallut.textual.decoration.{BoxChar, Fill, Border}
+import com.cengallut.textual.core.{GridAgent, CharGrid}
+import com.cengallut.textual.{Action, TextualView}
+
+class Minesweeper extends Activity
+    with BufferStateListener with GridAgent {
 
   var buffer    = CharGrid.zero
   var minefield = CharGrid.zero
@@ -23,13 +25,16 @@ class Minesweeper extends Activity with BufferStateListener {
 
   override def onBufferReady(b: CharGrid): Unit = {
     buffer = b
-    minefield = b.shrink(1, 1, 1, 1)
-    new Border.Simple('#').decorate(buffer)
+    minefield = b.shrink(1)
+
+    new Border.Box(BoxChar.Box.double).decorate(buffer)
     new Fill('.').decorate(minefield)
     mines = generateMines(minefield.width, minefield.height, 40)
+
+    grid.setOnTouchListener(Action(minefield).touch(this))
   }
 
-  def onGridTouch(x: Int, y: Int): Unit = {
+  override def onAction(x: Int, y: Int): Unit = {
     if (mines(x, y)) {
       Toast.makeText(this, "You're dead", Toast.LENGTH_SHORT).show()
       this.finish()
@@ -39,32 +44,18 @@ class Minesweeper extends Activity with BufferStateListener {
     }
   }
 
-  def visitAll(x: Int, y: Int): Unit = {
-    var stack = List((x, y))
+  def visitAll(start: (Int,Int)): Unit = {
+    var stack = List(start)
     while (stack.nonEmpty) {
       val (xx, yy) = stack.head
-      visited += (xx -> yy)
       if (isVisitable(xx, yy)) {
         val (c, pts) = process(xx, yy)
-
+        minefield.setChar(xx, yy, c)
+        stack = stack.tail ++ pts
+      } else {
+        stack = stack.tail
       }
-      stack = stack.tail ++ visit(xx, yy)
-    }
-  }
-
-  def visit(x: Int, y: Int): Seq[(Int,Int)] = {
-    if (!visited(x, y) && !mines(x, y) && minefield.isInRange(x, y)) {
-
-      mineCount(x, y) match {
-        case 0 =>
-          minefield.setChar(x, y, ' ')
-          neighborsFour(x, y)
-        case n =>
-          minefield.setChar(x, y, (48 + n).toChar)
-          List()
-      }
-    } else {
-      List()
+      visited += (xx -> yy)
     }
   }
 
