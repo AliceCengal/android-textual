@@ -117,11 +117,13 @@ object CharGrid {
       *
       * The returned Buffer view shares the underlying representation
       * with the original Buffer. */
-    def shrink(offset: (Int,Int,Int,Int)): CharGrid = {
-      val width = b.width - offset._3 - offset._1
-      val height = b.height - offset._4 - offset._2
-      new GridView(b, offset.copy(_3 = width, _4 = height))
+    def shrink(left: Int, top: Int, right: Int, bottom: Int): CharGrid = {
+      val width = b.width - right - left
+      val height = b.height - bottom - top
+      new GridView(b, (left, top, width, height))
     }
+
+    def shrink(offset: Int): CharGrid = shrink(offset, offset, offset,  offset)
 
     /** Returns two Buffers. */
     def verticalBisect: (CharGrid,CharGrid) = {
@@ -134,17 +136,17 @@ object CharGrid {
     /** Returns two Buffers. */
     def horizontalBisect: (CharGrid,CharGrid) = {
       val (bottomOffset, topOffset) = partitionLength(b.height, 0.5)
-      val top = shrink(0, topOffset, 0, 0)
-      val bottom = shrink(0, 0, 0, bottomOffset)
+      val top = shrink(0, 0, 0, topOffset)
+      val bottom = shrink(0, bottomOffset, 0, 0)
       (top, bottom)
     }
 
     /** Returns two Buffers. */
     def verticalSplit(ratio: Double): (CharGrid,CharGrid) = {
-      val (bottomOffset, topOffset) = partitionLength(b.height, ratio)
-      val top = shrink(0, topOffset, 0, 0)
-      val bottom = shrink(0, 0, 0, bottomOffset)
-      (top, bottom)
+      val (rightOffset, leftOffset) = partitionLength(b.height, ratio)
+      val left = shrink(0, 0, leftOffset, 0)
+      val right = shrink(rightOffset, 0, 0, 0)
+      (left, right)
     }
 
     /** Returns two Buffers. */

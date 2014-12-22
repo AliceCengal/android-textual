@@ -7,7 +7,8 @@ import com.cengallut.textual.core.CharGrid
 import com.cengallut.textual.decoration.{BoxChar, Fill, Border}
 import com.cengallut.textual.decoration.BoxChar.Box
 
-class Borders extends Activity with TextualView.BufferStateListener {
+/** Demonstration of decoration for multiple sub-grids. */
+class Demo2 extends Activity with TextualView.BufferStateListener {
 
   override def onBufferReady(buffer: CharGrid): Unit = {
 
@@ -20,8 +21,6 @@ class Borders extends Activity with TextualView.BufferStateListener {
     new Border.Box(Box.double).decorate(topRight)
     new Border.Box(Box.rounded).decorate(botLeft)
     new Border.Box(Box.dash3).decorate(botRight)
-
-    new Fill(BoxChar.Shade.forwardChecker).decorate(botRight.shrink(1, 1, 1, 1))
 
     buffer.notifyChanged()
   }
