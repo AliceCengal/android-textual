@@ -99,6 +99,9 @@ object BoxChar {
     val light  = '\u2591'
     val medium = '\u2592'
     val heavy  = '\u5293'
+
+    val forwardChecker = '\u259e'
+    val reverseChecker = '\u259a'
   }
 
   class Box(val corner: Corner, val line: Line)

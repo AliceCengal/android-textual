@@ -21,6 +21,8 @@ class Borders extends Activity with TextualView.BufferStateListener {
     new Border.Box(Box.rounded).decorate(botLeft)
     new Border.Box(Box.dash3).decorate(botRight)
 
+    new Fill(BoxChar.Shade.forwardChecker).decorate(botRight.shrink(1, 1, 1, 1))
+
     buffer.notifyChanged()
   }
 
