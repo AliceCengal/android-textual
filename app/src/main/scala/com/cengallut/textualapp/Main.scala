@@ -30,7 +30,7 @@ class Main extends Activity with AdapterView.OnItemClickListener {
     position match {
       case 0 => startActivity(new Intent(this, classOf[Demo1]))
       case 1 => startActivity(new Intent(this, classOf[Demo2]))
-      case 2 => startActivity(new Intent(this, classOf[Minesweeper]))
+      case 2 => startActivity(new Intent(this, classOf[Demo3]))
     }
 
   }

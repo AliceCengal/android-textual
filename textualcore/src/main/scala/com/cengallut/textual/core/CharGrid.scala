@@ -152,8 +152,8 @@ object CharGrid {
     /** Returns two Buffers. */
     def horizontalSplit(ratio: Double): (CharGrid,CharGrid) = {
       val (bottomOffset, topOffset) = partitionLength(b.height, ratio)
-      val top = shrink(0, topOffset, 0, 0)
-      val bottom = shrink(0, 0, 0, bottomOffset)
+      val top = shrink(0, 0, 0, topOffset)
+      val bottom = shrink(0, bottomOffset, 0, 0)
       (top, bottom)
     }
 
