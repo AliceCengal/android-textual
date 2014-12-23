@@ -1,1 +1,1 @@
-include ':app', ':textual-android', ':javademo', ':textualcore'
+include ':core', ':textual-android', 'textual-swing', ':demo-android-scala',  ':demo-android-java'

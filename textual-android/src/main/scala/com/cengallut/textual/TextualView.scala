@@ -27,17 +27,18 @@ class TextualView private (context: Context, btl: BufferStateListener)
   /** Holds the information needed to draw characters onto the canvas. This object is used to
     * calculate the individual sizes of each character, and so determines how big of a buffer is
     * needed to fill a screen. */
-  private val paint = {
+  private lazy val paint = {
     val p = new Paint
     p.setTextSize(textSize)
     p.setColor(textColor)
-    p.setTypeface(Typeface.MONOSPACE)
+    val mono = Typeface.createFromAsset(context.getAssets, "Everson Mono.ttf")
+    p.setTypeface(mono)
     p
   }
 
   /** Calculate the maximum bounding box for a character when it is drawn on a canvas, using
     * the paint object created previously. This dimension includes ascenders and descenders. */
-  private val charDimension = {
+  private lazy val charDimension = {
     val rect = new Rect
     paint.getTextBounds(Array('j', 'k'), 0, 2, rect)
     val charHeight = rect.height()
