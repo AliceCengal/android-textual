@@ -10,8 +10,8 @@ import com.cengallut.textual.{Action, TextualView}
 class Demo1 extends Activity with TextualView.BufferStateListener {
 
   val decos = Seq(
-    new Fill('O'),
-    new Border.Simple('+'))
+    Fill.using('O'),
+    Border.simple('+'))
 
   var buffer = CharGrid.zero
 

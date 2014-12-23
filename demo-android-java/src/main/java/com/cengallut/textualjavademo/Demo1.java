@@ -20,7 +20,7 @@ public class Demo1 extends Activity
 
     final List<Decoration> decos = Arrays.asList(
             Fill.using('o'),
-            new Border.Simple('#'));
+            Border.simple('#'));
 
     CharGrid buffer = null;
 
