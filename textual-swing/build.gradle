@@ -2,4 +2,11 @@ apply plugin: 'scala'
 
 dependencies {
     compile 'org.scala-lang:scala-library:2.10.3'
+    compile 'org.scala-lang:scala-swing:2.10.3'
+}
+
+task run(type: JavaExec, dependsOn: classes) {
+    main = 'com.cengallut.textual.TestApp'
+    classpath sourceSets.main.runtimeClasspath
+    classpath configurations.runtime
 }
