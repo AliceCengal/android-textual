@@ -25,6 +25,8 @@ class ComponentEventDemo extends ComponentListener {
 
 class TextualPanel extends Panel {
   
+  
+  
   override def paintComponent(g: Graphics2D) {
     g.clearRect(0, 0, size.width, size.height)
     

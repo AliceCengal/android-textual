@@ -1,38 +1,42 @@
 package com.cengallut.textual.core
 
-import com.cengallut.textual.aside.Sugar._
+class GenCursor[C <: GenCursor[C]](val grid: CharGrid) {
 
-trait Cursor {
+  private var pos = (0,0)
 
-  def write(c: Char): Cursor
+  final def move(dx: Int = 0, dy: Int = 0): C = {
+    pos = (pos._1 + dx, pos._2 + dy)
+    this.asInstanceOf[C]
+  }
 
-  def write(s: String): Cursor
+  final def moveTo(x: Int = pos._1, y: Int = pos._2): C = {
+    pos = (x, y)
+    this.asInstanceOf[C]
+  }
 
-  def linearMove(steps: Int): Cursor
+  final def current: Char = grid.charAt(pos._1, pos._2)
 
-  def advance() = linearMove(1)
+  final def set(c: Char): C = {
+    grid.setChar(pos._1, pos._2, c)
+    this.asInstanceOf[C]
+  }
 
-  def retreat() = linearMove(-1)
+  final def isInRange = grid.isInRange(pos._1, pos._2)
 
-  def current: Char
+  final def xPos = pos._1
 
+  final def yPos = pos._2
 }
 
-trait RawCursor[C <: RawCursor[C]] {
+trait RawCursor extends GenCursor[RawCursor]
 
-  def set(c: Char): C
+trait TextCursor extends GenCursor[TextCursor] {
 
-  def move(dx: Int, dy: Int): C
+  def write(c: Char): TextCursor =
+    set(c).linearMove(1)
 
-  def current: Char
-
-}
-
-trait TextCursor extends RawCursor[TextCursor] {
-
-  def write(c: Char): TextCursor
-
-  def write(s: String): TextCursor
+  def write(s: String): TextCursor =
+    s.foldLeft(this) { case (cursor, c) => write(c) }
 
   def writeLn(c: Char): TextCursor =
     write(c).newLine()
@@ -40,54 +44,58 @@ trait TextCursor extends RawCursor[TextCursor] {
   def writeLn(s: String): TextCursor =
     write(s).newLine()
 
-  def linearMove(steps: Int): TextCursor
+  def linearMove(steps: Int): TextCursor = {
+    move(dx = steps)
 
-  def advance() = linearMove(1)
+    while (xPos > grid.width) {
+      move(dx = -grid.width, dy = 1)
+    }
 
-  def retreat() = linearMove(-1)
+    while (xPos < 0) {
+      move(dx = grid.width, dy = -1)
+    }
 
-  def newLine(): TextCursor
+    this
+  }
 
-  def backspace()
+  def advance() =
+    linearMove(1)
+
+  def retreat() =
+    linearMove(-1)
+
+  def newLine(): TextCursor =
+    moveTo(x = 0, y = yPos + 1)
+
+  def backspace() =
+    retreat().set(' ')
+
+  def toLeftMargin =
+    moveTo(x = 0)
+
+  def toRightMargin =
+    moveTo(x = grid.width - 1)
+   
+}
+
+trait GridCursor extends GenCursor[GridCursor] {
+
+  def write(src: CharGrid): GridCursor = {
+    for {
+      dx <- 0 until src.width
+      dy <- 0 until src.height
+    } grid.setChar(xPos + dx, yPos + dy, src.charAt(dx, dy))
+    this
+  }
 
 }
 
 object Cursor {
 
-  def base(grid: CharGrid): Cursor = new BaseCursor(grid)
+  def raw(base: CharGrid): RawCursor = new GenCursor[RawCursor](base) with RawCursor
 
-  private class BaseCursor(val grid: CharGrid) extends Cursor {
+  def text(base: CharGrid): TextCursor = new GenCursor[TextCursor](base) with TextCursor
 
-    private var position = (0,0)
-
-    override def write(c: Char): Cursor = {
-      grid.setChar(position.x, position.y, c)
-      grid.notifyChanged()
-      advance()
-      this
-    }
-
-    override def write(s: String): Cursor = {
-      s.foreach { c =>
-        grid.setChar(position.x, position.y, c)
-        advance()
-      }
-      grid.notifyChanged()
-      this
-    }
-
-    override def linearMove(steps: Int): Cursor = {
-      var xNew = (position.x + steps) % grid.width
-      var yNew = position.y + ((position.x + steps) / grid.width)
-
-
-      position = (xNew, yNew)
-      this
-    }
-
-    override def current: Char =
-      grid.charAt(position.x, position.y)
-
-  }
+  def grid(base: CharGrid): GridCursor = new GenCursor[GridCursor](base) with GridCursor
 
 }

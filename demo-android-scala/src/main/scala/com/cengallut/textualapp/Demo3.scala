@@ -1,21 +1,10 @@
 package com.cengallut.textualapp
 
-import android.app.Activity
-import android.os.Bundle
-import com.cengallut.textual.{TouchComposite, Action, TextualView}
+import com.cengallut.textual.{TextualActivity, TouchComposite, Action}
 import com.cengallut.textual.core.CharGrid
 
-class Demo3 extends Activity with TextualView.BufferStateListener {
-
-  var buffer = CharGrid.zero
-
-  lazy val textGrid = TextualView.create(this)
-
-
-  override def onCreate(savedInstanceState: Bundle): Unit = {
-    super.onCreate(savedInstanceState)
-    setContentView(textGrid)
-  }
+/** Demonstration of event handling for multiple sub-grids. */
+class Demo3 extends TextualActivity {
 
   override def onBufferReady(buffer: CharGrid): Unit = {
 
@@ -39,7 +28,7 @@ class Demo3 extends Activity with TextualView.BufferStateListener {
 
     val compositeTouch = TouchComposite.empty + topTouch + botTouch
 
-    textGrid.setOnTouchListener(compositeTouch)
+    view.setOnTouchListener(compositeTouch)
 
   }
 

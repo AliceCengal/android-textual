@@ -4,17 +4,33 @@ import android.content.Context
 import android.graphics._
 import com.cengallut.textual.TextualView.BufferStateListener
 import com.cengallut.textual.aside.Sugar._
-import com.cengallut.textual.core.{FilterMap, Cursor, CharGrid}
+import com.cengallut.textual.core.{TextCursor, FilterMap, Cursor, CharGrid}
 
 /** Displays an array of characters as a grid throughout its view window. */
 class TextualView private (context: Context, btl: BufferStateListener)
     extends android.view.View(context) {
 
-  def textSize: Float = 48f
+  private var textSize_ = 48f
 
-  def textColor: Int = Color.WHITE
+  def textSize(s: Float): TextualView = {
+    textSize_ = s
 
-  def background: Int = Color.BLACK
+    this
+  }
+
+  private var textColor_ = Color.WHITE
+
+  def textColor(c: Int) = {
+    textColor_ = c
+    this
+  }
+
+  private var background_ = Color.BLACK
+
+  def background(c: Int) = {
+    background_ = c
+    this
+  }
 
   private val bufferStateListener = btl
 
@@ -22,15 +38,15 @@ class TextualView private (context: Context, btl: BufferStateListener)
 
   private[textual] var filterMap = FilterMap.identity
 
-  lazy val cursor: Cursor = Cursor.base(buffer)
+  lazy val cursor: TextCursor = Cursor.text(buffer)
 
   /** Holds the information needed to draw characters onto the canvas. This object is used to
     * calculate the individual sizes of each character, and so determines how big of a buffer is
     * needed to fill a screen. */
   private lazy val paint = {
     val p = new Paint
-    p.setTextSize(textSize)
-    p.setColor(textColor)
+    p.setTextSize(textSize_)
+    p.setColor(textColor_)
     val mono = Typeface.createFromAsset(context.getAssets, "Everson Mono.ttf")
     p.setTypeface(mono)
     p
@@ -67,7 +83,7 @@ class TextualView private (context: Context, btl: BufferStateListener)
 
   override /* android.view.View */
   protected def onDraw(c: Canvas): Unit = {
-    c.drawColor(background)
+    c.drawColor(background_)
 
     val charBuffer = Array('c')
     var x = buffer.width

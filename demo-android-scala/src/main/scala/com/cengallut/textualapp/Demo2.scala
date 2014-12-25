@@ -1,14 +1,12 @@
 package com.cengallut.textualapp
 
-import android.app.Activity
-import android.os.Bundle
-import com.cengallut.textual.TextualView
+import com.cengallut.textual.TextualActivity
 import com.cengallut.textual.core.CharGrid
 import com.cengallut.textual.decoration.{BoxChar, Fill, Border}
 import com.cengallut.textual.decoration.BoxChar.Box
 
 /** Demonstration of decoration for multiple sub-grids. */
-class Demo2 extends Activity with TextualView.BufferStateListener {
+class Demo2 extends TextualActivity {
 
   override def onBufferReady(buffer: CharGrid): Unit = {
 
@@ -29,11 +27,6 @@ class Demo2 extends Activity with TextualView.BufferStateListener {
       .decorate(botRight.shrink(1))
 
     buffer.notifyChanged()
-  }
-
-  override def onCreate(saved: Bundle) = {
-    super.onCreate(saved)
-    setContentView(TextualView.create(this))
   }
 
 }
