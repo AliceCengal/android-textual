@@ -47,7 +47,7 @@ trait CharGrid {
 object CharGrid {
 
   /** Returns a Grid of dimension 0x0. */
-  val zero: CharGrid = CharGrid.ofDim(0, 0)
+  def zero: CharGrid = CharGrid.ofDim(0, 0)
 
   /** Returns a Grid of the specified. */
   def ofDim(xDim: Int, yDim: Int): CharGrid =

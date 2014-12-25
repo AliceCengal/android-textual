@@ -17,7 +17,7 @@ class Minesweeper extends TextualActivity with GridAgent {
   override def onBufferReady(b: CharGrid): Unit = {
     minefield = b.shrink(1)
 
-    Border.box(BoxChar.Box.double).decorate(b)
+    Border.box(BoxChar.Box.twin).decorate(b)
     Fill.using(BoxChar.Shade.light).decorate(minefield)
     mines = generateMines(minefield.width, minefield.height, 0.5)
 

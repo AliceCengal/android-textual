@@ -1,10 +1,7 @@
 package com.cengallut.textualjavademo;
 
-import android.app.Activity;
-import android.os.Bundle;
-
 import com.cengallut.textual.Action;
-import com.cengallut.textual.TextualView;
+import com.cengallut.textual.TextualActivity;
 import com.cengallut.textual.core.CharGrid;
 import com.cengallut.textual.core.GridAgent;
 import com.cengallut.textual.decoration.Border;
@@ -15,23 +12,14 @@ import java.util.Arrays;
 import java.util.List;
 
 /** Demonstration of decoration and touch event handling for a single Grid. */
-public class Demo1 extends Activity
-        implements TextualView.BufferStateListener, GridAgent {
+public class Demo1 extends TextualActivity
+        implements GridAgent {
 
     final List<Decoration> decos = Arrays.asList(
             Fill.using('o'),
             Border.simple('#'));
 
     CharGrid buffer = null;
-
-    TextualView textual = null;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        textual = TextualView.create(this);
-        setContentView(textual);
-    }
 
     @Override
     public void onBufferReady(CharGrid b) {
@@ -41,10 +29,8 @@ public class Demo1 extends Activity
             d.decorate(b);
         }
 
-        textual.setOnTouchListener(new Action(b).touch(this));
-
+        view().setOnTouchListener(new Action(b).touch(this));
         buffer.notifyChanged();
-
     }
 
     @Override

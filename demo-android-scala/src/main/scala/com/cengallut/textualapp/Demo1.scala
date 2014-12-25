@@ -1,10 +1,8 @@
 package com.cengallut.textualapp
 
-import android.app.Activity
-import android.os.Bundle
 import com.cengallut.textual.core.CharGrid
 import com.cengallut.textual.decoration.{Fill, Border}
-import com.cengallut.textual.{TextualActivity, Action, TextualView}
+import com.cengallut.textual.{TextualActivity, Action}
 
 /** Demonstration of decoration and touch event handling for a single Grid. */
 class Demo1 extends TextualActivity {
