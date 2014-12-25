@@ -69,7 +69,8 @@ object CharGrid {
 
   /** Wrapper class for adding extension methods for cloning and sub-viewing
     * a CharGrid. */
-  implicit class Prototype(val b: CharGrid) extends AnyVal {
+  implicit class Prototype(val b: CharGrid) extends JavaPrototypeHelper {
+    import Prototype._
 
     /** Returns a view into the current Grid.
       *
@@ -157,12 +158,6 @@ object CharGrid {
       (top, bottom)
     }
 
-    /** Returns a pair (n1,n2) such that n1 + n2 == l  and n1/l == ratio */
-    private def partitionLength(l: Int, ratio: Double): (Int,Int) = {
-      val first = (l * ratio).ceil.toInt
-      ( first , l - first )
-    }
-
     /** Creates a new Buffer with a separate underlying representation
       * but the same content and same dimension. Any modification made to the new Buffer
       * does not affect the original, and vice versa. */
@@ -173,6 +168,65 @@ object CharGrid {
         y <- 0 until b.height
       } bNew.setChar(x, y, b.charAt(x, y))
       bNew
+    }
+
+  }
+
+  object Prototype {
+    /** Returns a pair (n1,n2) such that n1 + n2 == l  and n1/l == ratio */
+    def partitionLength(l: Int, ratio: Double): (Int,Int) = {
+      val first = (l * ratio).ceil.toInt
+      ( first , l - first )
+    }
+  }
+
+  trait JavaPrototypeHelper {
+    self: Prototype =>
+    import Prototype.partitionLength
+
+    def topBisect: CharGrid = {
+      val (_, topOffset) = partitionLength(b.height, 0.5)
+      shrink(0, 0, 0, topOffset)
+    }
+
+    def bottomBisect: CharGrid = {
+      val (bottomOffset, _) = partitionLength(b.height, 0.5)
+      shrink(0, bottomOffset, 0, 0)
+    }
+
+    def leftBisect: CharGrid = {
+      val (_, leftOffset) = partitionLength(b.width, 0.5)
+      shrink(0, 0, leftOffset, 0)
+
+    }
+
+    def rightBisect: CharGrid = {
+      val (rightOffset, _) = partitionLength(b.width, 0.5)
+      shrink(rightOffset, 0, 0, 0)
+    }
+
+    /** Returns two Buffers. */
+    def leftSplit(ratio: Double): CharGrid = {
+      val (_, leftOffset) = partitionLength(b.height, ratio)
+      shrink(0, 0, leftOffset, 0)
+    }
+
+    /** Returns two Buffers. */
+    def rightSplit(ratio: Double): CharGrid = {
+      val (rightOffset, _) = partitionLength(b.height, ratio)
+      shrink(rightOffset, 0, 0, 0)
+    }
+
+    /** Returns two Buffers. */
+    def topSplit(ratio: Double): CharGrid = {
+      val (_, topOffset) = partitionLength(b.height, ratio)
+      shrink(0, 0, 0, topOffset)
+    }
+
+    /** Returns two Buffers. */
+    def bottomSplit(ratio: Double): CharGrid = {
+      val (bottomOffset, _) = partitionLength(b.height, ratio)
+      shrink(0, bottomOffset, 0, 0)
     }
 
   }

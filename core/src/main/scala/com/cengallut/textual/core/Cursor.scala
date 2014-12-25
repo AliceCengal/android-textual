@@ -2,30 +2,31 @@ package com.cengallut.textual.core
 
 class GenCursor[C <: GenCursor[C]](val grid: CharGrid) {
 
-  private var pos = (0,0)
+  protected var xPos = 0
+
+  protected var yPos = 0
 
   final def move(dx: Int = 0, dy: Int = 0): C = {
-    pos = (pos._1 + dx, pos._2 + dy)
+    xPos += dx
+    yPos += dy
     this.asInstanceOf[C]
   }
 
-  final def moveTo(x: Int = pos._1, y: Int = pos._2): C = {
-    pos = (x, y)
+  final def moveTo(x: Int = xPos, y: Int = yPos): C = {
+    xPos = x
+    yPos = y
     this.asInstanceOf[C]
   }
 
-  final def current: Char = grid.charAt(pos._1, pos._2)
+  final def current: Char = grid.charAt(xPos, yPos)
 
   final def set(c: Char): C = {
-    grid.setChar(pos._1, pos._2, c)
+    grid.setChar(xPos, yPos, c)
     this.asInstanceOf[C]
   }
 
-  final def isInRange = grid.isInRange(pos._1, pos._2)
+  final def isInRange = grid.isInRange(xPos, yPos)
 
-  final def xPos = pos._1
-
-  final def yPos = pos._2
 }
 
 trait RawCursor extends GenCursor[RawCursor]
