@@ -16,7 +16,7 @@ public class Main extends Activity implements AdapterView.OnItemClickListener {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_list_item_1,
-                new String[] {"Demo 1", "Demo 2", "Demo 3"});
+                new String[] {"Demo 1", "Demo 2", "Demo 3", "Demo 4"});
 
         ListView list = new ListView(this);
         list.setAdapter(adapter);
@@ -41,6 +41,8 @@ public class Main extends Activity implements AdapterView.OnItemClickListener {
             case 2:
                 startActivity(new Intent(this, Demo3.class));
                 break;
+            case 3:
+                startActivity(new Intent(this, Demo4.class));
         }
 
     }

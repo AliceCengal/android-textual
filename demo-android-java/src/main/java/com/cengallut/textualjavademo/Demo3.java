@@ -31,7 +31,7 @@ public class Demo3 extends TextualActivity {
         View.OnTouchListener botTouch = new Action(bottom).touch(new GridAgent() {
             @Override public void onAction(int x, int y) {
                 if (bottom.charAt(x, y) == 'o') {
-                    bottom.setChar(x, y, 'T');
+                    bottom.setChar(x, y, 'B');
                 } else {
                     bottom.setChar(x, y, 'o');
                 }
