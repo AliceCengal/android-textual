@@ -48,7 +48,7 @@ trait TextCursor extends GenCursor[TextCursor] {
   def linearMove(steps: Int): TextCursor = {
     move(dx = steps)
 
-    while (xPos > grid.width) {
+    while (xPos >= grid.width) {
       move(dx = -grid.width, dy = 1)
     }
 
