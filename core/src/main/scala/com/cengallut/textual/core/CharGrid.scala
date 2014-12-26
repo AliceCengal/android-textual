@@ -44,14 +44,10 @@ trait CharGrid {
 
 }
 
-object CharGrid {
+object CharGrid extends GridFactory {
 
-  /** Returns a Grid of dimension 0x0. */
-  def zero: CharGrid = CharGrid.ofDim(0, 0)
-
-  /** Returns a Grid of the specified. */
-  def ofDim(xDim: Int, yDim: Int): CharGrid =
-    new BasicGrid(xDim, yDim)
+  implicit def prototypeFromGrid(g: CharGrid): PrototypeWrapper =
+    new PrototypeWrapper(g)
 
   trait UpdateListener {
     def onGridUpdated(): Unit
@@ -67,171 +63,7 @@ object CharGrid {
     }
   }
 
-  /** Wrapper class for adding extension methods for cloning and sub-viewing
-    * a CharGrid. */
-  implicit class Prototype(val b: CharGrid) extends JavaPrototypeHelper {
-    import Prototype._
-
-    /** Returns a view into the current Grid.
-      *
-      * offset_1 :: left
-      * offset_2 :: top
-      * offset_3 :: width
-      * offset_4 :: height
-      *
-      * if b is a 6x5 buffer:
-      *
-      *     ######
-      *     ######
-      *     ######
-      *     ######
-      *     ######
-      *
-      * Then calling b.takeView(1, 2, 3, 2) return a view to
-      * the region marked as 'O'
-      *
-      *     ######
-      *     ######
-      *     #OOO##
-      *     #OOO##
-      *     ######
-      *
-      * The returned Grid7 shares the underlying representation
-      * with the original Grid. */
-    def takeView(offset: (Int,Int,Int,Int)): CharGrid =
-      new GridView(b, offset)
-
-    /** Same as before. */
-    def takeView(left: Int, top: Int, width: Int, height: Int): CharGrid =
-      new GridView(b, (left, top, width, height))
-
-    /** Returns a view into the current buffer with the given distance from
-      * the edges, in the order (left, top, right, bottom)
-      *
-      * Calling b.shrink(1, 2, 1, 1) yields the following region marked as 'O'
-      *
-      *     ######
-      *     ######
-      *     #OOOO#
-      *     #OOOO#
-      *     ######
-      *
-      * The returned Buffer view shares the underlying representation
-      * with the original Buffer. */
-    def shrink(left: Int, top: Int, right: Int, bottom: Int): CharGrid = {
-      val width = b.width - right - left
-      val height = b.height - bottom - top
-      new GridView(b, (left, top, width, height))
-    }
-
-    def shrink(offset: Int): CharGrid = shrink(offset, offset, offset,  offset)
-
-    /** Returns two Buffers. */
-    def verticalBisect: (CharGrid,CharGrid) = {
-      val (rightOffset, leftOffset) = partitionLength(b.width, 0.5)
-      val left = shrink(0, 0, leftOffset, 0)
-      val right = shrink(rightOffset, 0, 0, 0)
-      (left, right)
-    }
-
-    /** Returns two Buffers. */
-    def horizontalBisect: (CharGrid,CharGrid) = {
-      val (bottomOffset, topOffset) = partitionLength(b.height, 0.5)
-      val top = shrink(0, 0, 0, topOffset)
-      val bottom = shrink(0, bottomOffset, 0, 0)
-      (top, bottom)
-    }
-
-    /** Returns two Buffers. */
-    def verticalSplit(ratio: Double): (CharGrid,CharGrid) = {
-      val (rightOffset, leftOffset) = partitionLength(b.height, ratio)
-      val left = shrink(0, 0, leftOffset, 0)
-      val right = shrink(rightOffset, 0, 0, 0)
-      (left, right)
-    }
-
-    /** Returns two Buffers. */
-    def horizontalSplit(ratio: Double): (CharGrid,CharGrid) = {
-      val (bottomOffset, topOffset) = partitionLength(b.height, ratio)
-      val top = shrink(0, 0, 0, topOffset)
-      val bottom = shrink(0, bottomOffset, 0, 0)
-      (top, bottom)
-    }
-
-    /** Creates a new Buffer with a separate underlying representation
-      * but the same content and same dimension. Any modification made to the new Buffer
-      * does not affect the original, and vice versa. */
-    def copy: CharGrid = {
-      val bNew = new BasicGrid(b.width, b.height)
-      for {
-        x <- 0 until b.width
-        y <- 0 until b.height
-      } bNew.setChar(x, y, b.charAt(x, y))
-      bNew
-    }
-
-  }
-
-  object Prototype {
-    /** Returns a pair (n1,n2) such that n1 + n2 == l  and n1/l == ratio */
-    def partitionLength(l: Int, ratio: Double): (Int,Int) = {
-      val first = (l * ratio).ceil.toInt
-      ( first , l - first )
-    }
-  }
-
-  trait JavaPrototypeHelper {
-    self: Prototype =>
-    import Prototype.partitionLength
-
-    def topBisect: CharGrid = {
-      val (_, topOffset) = partitionLength(b.height, 0.5)
-      shrink(0, 0, 0, topOffset)
-    }
-
-    def bottomBisect: CharGrid = {
-      val (bottomOffset, _) = partitionLength(b.height, 0.5)
-      shrink(0, bottomOffset, 0, 0)
-    }
-
-    def leftBisect: CharGrid = {
-      val (_, leftOffset) = partitionLength(b.width, 0.5)
-      shrink(0, 0, leftOffset, 0)
-
-    }
-
-    def rightBisect: CharGrid = {
-      val (rightOffset, _) = partitionLength(b.width, 0.5)
-      shrink(rightOffset, 0, 0, 0)
-    }
-
-    /** Returns two Buffers. */
-    def leftSplit(ratio: Double): CharGrid = {
-      val (_, leftOffset) = partitionLength(b.height, ratio)
-      shrink(0, 0, leftOffset, 0)
-    }
-
-    /** Returns two Buffers. */
-    def rightSplit(ratio: Double): CharGrid = {
-      val (rightOffset, _) = partitionLength(b.height, ratio)
-      shrink(rightOffset, 0, 0, 0)
-    }
-
-    /** Returns two Buffers. */
-    def topSplit(ratio: Double): CharGrid = {
-      val (_, topOffset) = partitionLength(b.height, ratio)
-      shrink(0, 0, 0, topOffset)
-    }
-
-    /** Returns two Buffers. */
-    def bottomSplit(ratio: Double): CharGrid = {
-      val (bottomOffset, _) = partitionLength(b.height, ratio)
-      shrink(0, bottomOffset, 0, 0)
-    }
-
-  }
-
-  private class BasicGrid(xDim: Int, yDim: Int) extends CharGrid {
+  private[core] class BasicGrid(xDim: Int, yDim: Int) extends CharGrid {
 
     /** The most important thing in the whole library, yet so innocuous. */
     private val buffer = Array.fill[Char](xDim * yDim)(' ')
@@ -259,7 +91,7 @@ object CharGrid {
     override def filterMap: FilterMap = FilterMap.identity
   }
 
-  private class GridView(
+  private[core] class GridView(
       private val basis: CharGrid,
       private val bound: (Int,Int,Int,Int)) extends CharGrid {
 

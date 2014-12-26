@@ -7,15 +7,15 @@ import com.cengallut.textual.TextualActivity;
 import com.cengallut.textual.TouchComposite;
 import com.cengallut.textual.core.CharGrid;
 import com.cengallut.textual.core.GridAgent;
+import com.cengallut.textual.core.Grids;
 
 /** Demonstration of event handling for multiple sub-grids. */
 public class Demo3 extends TextualActivity {
     @Override
     public void onBufferReady(CharGrid buffer) {
 
-        CharGrid.Prototype p = new CharGrid.Prototype(buffer);
-        final CharGrid top = p.topBisect();
-        final CharGrid bottom = p.bottomBisect();
+        final CharGrid top = Grids.factory.topBisect(buffer);
+        final CharGrid bottom = Grids.factory.bottomBisect(buffer);
 
         View.OnTouchListener topTouch = new Action(top).touch(new GridAgent() {
             @Override public void onAction(int x, int y) {
